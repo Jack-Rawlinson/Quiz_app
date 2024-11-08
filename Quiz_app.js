@@ -35,28 +35,44 @@ function load_event(event){
 }
 
 function show_question(){
-    document.getElementById("debug").innerHTML = quiz_data[question_no];
-    random_sort(quiz_data[question_no]);
-    document.getElementById("debug").innerHTML += "<br>" + quiz_data[question_no];
+    // array to decide order that answers appear on buttons
+    let answer_index = [1,2,3,4];
+    // Randomize order
+    random_sort(answer_index);
     // Update elements in question_div to show the current question
-    document.getElementById("Question").innerHTML = quiz_data[question_no][0];
-    document.getElementById("answer_1").textContent = quiz_data[question_no][1];
-    document.getElementById("answer_2").textContent = quiz_data[question_no][2];
-    document.getElementById("answer_3").textContent = quiz_data[question_no][3];
-    document.getElementById("answer_4").textContent = quiz_data[question_no][4];
+    for(i in answer_index){
+        // variable to store index of answer (eaier to read this way)
+        let index = answer_index[i];
+        // increment for the benefit of the "anwer_"+i elements
+        i++;
+        // Set text, bg and function of each button
+        document.getElementById("answer_"+i).textContent = quiz_data[question_no][index];
+        document.getElementById("answer_"+i).style.background = "";
+        document.getElementById("answer_"+i).onclick = incorrect;
+        // Answer should always be the first element in the csv
+        if(index == 1){
+            document.getElementById("answer_"+i).onclick = correct;
+        }
+    }
 }
-
+function correct(){
+    let correct_index = parseInt(this.id.slice(-1));
+    document.getElementById("answer_"+correct_index).style.background = "green";
+}
+function incorrect(){
+    let correct_index = parseInt(this.id.slice(-1));
+    document.getElementById("answer_"+correct_index).style.background = "red";
+}
 function random_sort(array){
-    let index = array.length - 2;
-    //document.getElementById("debug").innerHTML += "<br>" + index;
+    // index range used for looping over array elements
+    let index = array.length;
     while(index > 0){
-        document.getElementById("debug").innerHTML += "<br>" + index;
-        let random_index = Math.floor(Math.random() * index) + 2;
-        document.getElementById("debug").innerHTML += " " + random_index;
+        // Generate random index to swap elements with
+        let random_index = Math.floor(Math.random() * index);
         index--;
 
-            // And swap it with the current element.
-        [array[index+1], array[random_index]] = [array[random_index], array[index+1]];
+        // Swap array elements
+        [array[index], array[random_index]] = [array[random_index], array[index]];
     }
 }
 function next_question(){
