@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+
+<body>
+    <div id="file_div">
+        <label for="file_input">Upload file</label>
+        <input type="file" id="fileinput" name="file_input">
+    </div>
+    <p id="debug"></p>
+
+    <div id="question_div" style="display:none">
+        <h5 id="Question"></h5><br>
+        <button id="answer_1"></button>
+        <button id="answer_2"></button><br>
+        <button id="answer_3"></button>
+        <button id="answer_4"></button><br>
+        <button onclick="next_question()">Next</button>
+        <button onclick="previous_question()">Back</button>
+    </div>
+<script src="Quiz_app.js"></script>
+</body>
+
+</html>
