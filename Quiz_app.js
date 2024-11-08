@@ -2,7 +2,7 @@
 document.getElementById("fileinput").addEventListener("change", loadfile);
 // Initialize global variables
 let quiz_data = [];
-let question_index = 0;
+let question_no = 0;
 
 function loadfile(event){
     /*
@@ -32,11 +32,12 @@ function load_event(event){
     for(let i=0;i<(csv_data.length/5); i++){
         quiz_data.push([csv_data[i*5], csv_data[(i*5)+1], csv_data[(i*5)+2], csv_data[(i*5)+3], csv_data[(i*5)+4]]);
     }
+    if(quiz_data.length == 1){document.getElementById("next_button").disbaled = true;}
     // Load first question 
-    show_question(question_index);
+    show_question();
 }
 
-function show_question(question_no){
+function show_question(){
     // Update elements in question_div to show the current question
     document.getElementById("debug").innerHTML += "<br> quiz_data = " + quiz_data;
     document.getElementById("Question").innerHTML = quiz_data[question_no][0];
@@ -44,4 +45,20 @@ function show_question(question_no){
     document.getElementById("answer_2").textContent = quiz_data[question_no][2];
     document.getElementById("answer_3").textContent = quiz_data[question_no][3];
     document.getElementById("answer_4").textContent = quiz_data[question_no][4];
+}
+function next_question(){
+    question_no += 1;
+    document.getElementById("back_button").disabled = false;
+     if(question_no == quiz_data.length-1){
+        document.getElementById("next_button").disabled = true;
+     }
+    show_question();
+}
+function previous_question(){
+    question_no -= 1;
+    document.getElementById("next_button").disabled = false;
+    if(question_no == 0){
+        document.getElementById("back_button").disabled = true;
+    }
+    show_question();
 }
