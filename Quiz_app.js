@@ -35,11 +35,9 @@ function load_event(event){
 }
 
 function show_question(){
-    document.getElementById("debug").innerHTML += "<br>" + quiz_data;
     if(answer_order.length <= question_no){
         // Array to decide order that answers appear on buttons
-        let answer_index = [1,2,3,4];    
-        document.getElementById("debug").innerHTML += "<br>answerindex = " + answer_index ;
+        let answer_index = [1,2,3,4];
         // Randomize order
         random_sort(answer_index);
         // Push an element in to store index of button that is pressed
@@ -127,6 +125,24 @@ function previous_question(){
     document.getElementById("next_button").disabled = false;
     if(question_no == 0){
         document.getElementById("back_button").disabled = true;
+    }
+    show_question();
+}
+function reset_quiz(){
+    /*
+    Reset the quiz so that it can be retaken
+    */
+   // Set all questions to unanswered
+    for(i in quiz_data){
+        quiz_data[i][5] = false;
+    }
+    correct_answers = 0;
+    question_no = 0;
+    // Enable/disable buttons as appropriate
+    document.getElementById("next_button").disabled = false;
+    document.getElementById("back_button").disabled = true;
+    if(quiz_data.length==0){
+        document.getElementById("next_button").disabled = true;
     }
     show_question();
 }
