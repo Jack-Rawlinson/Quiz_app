@@ -1,8 +1,10 @@
 // Run loadfile function when a file is entered
 document.getElementById("fileinput").addEventListener("change", loadfile);
 // Initialize global variables
-let quiz_data = [];
-let answer_order = [];
+let quiz_data = [];//[[question, corect_answer, inccorrect answer, ..., ..., boolena:question has been answered]]
+let answer_order = [];//[[display order of answers for Q1],[display order of answers for Q2],...]
+let time = [0,0] //[hours,minutes,seconds]
+let all_answered = false;
 let question_no = 0;
 let correct_answers = 0;
 
@@ -32,6 +34,7 @@ function load_event(event){
     if(quiz_data.length == 1){document.getElementById("next_button").disbaled = true;}
     // Load first question 
     show_question();
+    setTimeout(timer,1000);
 }
 
 function show_question(){
@@ -41,8 +44,8 @@ function show_question(){
         // Randomize order
         random_sort(answer_index);
         // Push an element in to store index of button that is pressed
-        answer_index.push(0)
         answer_order.push(answer_index);
+        answer_index.push(0);
     }
     document.getElementById("Question").textContent = quiz_data[question_no][0];
     document.getElementById("score").textContent = correct_answers+ "/" + quiz_data.length;
@@ -71,6 +74,35 @@ function show_question(){
         i--;
     }
 }
+function timer(){
+    /*
+    Repeatable function that will call itself every second to update the timer until all questions have been answered
+    */
+    // Increment the seconds & update minutes when necessary
+    time[0]++;
+    if(time[0] == 60){
+        time[1]++;
+        time[0] = 0;
+    }
+    // Format time into desired string format (00:00)
+    let mins = String(time[1]).padStart(2, '0');
+    let seconds = String(time[0]).padStart(2, '0');
+    // Show time
+    document.getElementById("timer").textContent = `${mins}:${seconds}`;
+    // Only call again if there is an unanswered question (This format leads timer to tick for one second more when quiz is finished)
+    if(!all_answered){
+        setTimeout(timer, 1000);
+    }
+}
+function quiz_finished(){
+    // Assume all questions have been answered until contrary is shown
+    all_answered = true;
+    for(question of quiz_data){
+        if(question[5] == false){
+            all_answered = false;
+        }
+    }
+}
 function correct(){
     // Change bg of correct button green
     let correct_index = parseInt(this.id.slice(-1));
@@ -80,6 +112,7 @@ function correct(){
         // update array so script knows this question has already been answered
         quiz_data[question_no][5] = true;
         show_question();
+        quiz_finished();
     }
 }
 function incorrect(){
@@ -92,6 +125,7 @@ function incorrect(){
         // update array so script knows this question has already been answered
         quiz_data[question_no][5] = true;
         show_question();
+        quiz_finished();
     }
 }
 function random_sort(array){
@@ -136,6 +170,8 @@ function reset_quiz(){
     for(i in quiz_data){
         quiz_data[i][5] = false;
     }
+    all_answered = false;
+    time = [0,0];
     correct_answers = 0;
     question_no = 0;
     // Enable/disable buttons as appropriate
@@ -145,4 +181,6 @@ function reset_quiz(){
         document.getElementById("next_button").disabled = true;
     }
     show_question();
+    document.getElementById("debug").innerHTML = "Restarting timer "
+    setTimeout(timer,1000);
 }
