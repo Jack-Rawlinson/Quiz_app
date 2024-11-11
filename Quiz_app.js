@@ -25,6 +25,9 @@ function loadfile(event){
 function load_event(event){
     // Split data by rows
     let rows = event.target.result.split("\n");
+    if(document.getElementById("header").checked){
+        rows.splice(0,1);
+    }
     // Store data in temp array to a 
     let csv_data =[];
     rows.forEach(row => csv_data.push(row.split(",")));
