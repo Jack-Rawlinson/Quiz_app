@@ -14,6 +14,11 @@ function loadfile(event){
     */
     // FileReader object to handle reading in the data
     const reader = new FileReader();
+    // Validate that the file entered is a csv file
+    if(event.target.files[0].name.slice(-3) != "csv"){
+        alert("File is not a csv");
+        return
+    }
     // Run load_event when file has been read, this will store the necessary data
     reader.onload = load_event;
     // Read data as a string
