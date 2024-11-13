@@ -1,7 +1,7 @@
 // Run loadfile function when a file is entered
 document.getElementById("fileinput").addEventListener("change", loadfile);
 // Initialize global variables
-let quiz_data = [];//[[question, corect_answer, inccorrect answer, ..., ..., boolena:question has been answered]]
+let quiz_data = [];//[[question, corect_answer, inccorrect answer, ..., ..., boolean:question has been answered]]
 let answer_order = [];//[[display order of answers for Q1],[display order of answers for Q2],...]
 let time = [0,0] //[hours,minutes,seconds]
 let all_answered = false;
@@ -44,7 +44,51 @@ function load_event(event){
     show_question();
     setTimeout(timer,1000);
 }
-
+async function get_categories(){
+    let array = await fetch_data("https://opentdb.com/api_category.php");
+    let categories = array["trivia_categories"];
+    categories.forEach(row => {
+        let option = document.createElement("option");
+        option.value = row["id"];
+        option.innerHTML = row["name"];
+        document.getElementById("categories").appendChild(option);
+    })
+}
+async function load_question_data(){
+    let setup = ``;
+    // Get number of desired questions from HTML
+    let no_questions = document.getElementById("number_of_questions").value;
+    let category = document.getElementById("categories").value;
+    let difficulty = document.getElementById("difficulty").value;
+    if(category != "all"){
+        setup = setup.concat("&category=", category);
+    }
+    if(difficulty != "any"){
+        setup = setup.concat("&difficulty=", difficulty);
+    }
+    // Fetch data from opendb api, use await to avoid astnc issue with data loading 
+    alert(`setup = ${setup}, url = https://opentdb.com/api.php?amount=${no_questions}&type=multiple${setup}`);
+    let questions = await fetch_data(`https://opentdb.com/api.php?amount=${no_questions}&type=multiple${setup}`);    
+    // Store questions from API in useable format 
+    questions["results"].forEach(row => quiz_data.push([row["question"], row["correct_answer"], row["incorrect_answers"][0], row["incorrect_answers"][1], row["incorrect_answers"][2], false]));
+    // Hide starting div for entering files and reveal div for anwsering questions
+    document.getElementById("file_div").style.display = "none";
+    document.getElementById("question_div").style.display = "";
+    show_question();
+    setTimeout(timer,1000);
+}
+async function fetch_data(url){
+    // Load data from url
+    let response = await fetch(url)
+    //Inform user of fetch errors
+    if (!response.ok) {
+        console.error('There was a problem with the fetch operation:', error);
+        //throw new Error('Network response was not ok');
+      }
+    // Store object data and return it 
+    let data = await response.json()
+    return data    
+}
 function show_question(){
     if(answer_order.length <= question_no){
         // Array to decide order that answers appear on buttons
@@ -55,7 +99,7 @@ function show_question(){
         answer_order.push(answer_index);
         answer_index.push(0);
     }
-    document.getElementById("Question").textContent = quiz_data[question_no][0];
+    document.getElementById("Question").innerHTML = quiz_data[question_no][0];
     document.getElementById("score").textContent = correct_answers+ "/" + quiz_data.length;
     // Update elements in question_div to show the current question
     for(let i=0; i<(answer_order[question_no].length - 1); i++){
@@ -64,7 +108,7 @@ function show_question(){
         // increment for the benefit of the "anwer_"+i elements
         i++;
         // Set text, bg and function of each button
-        document.getElementById("answer_"+i).textContent = quiz_data[question_no][index];
+        document.getElementById("answer_"+i).innerHTML = quiz_data[question_no][index];
         document.getElementById("answer_"+i).style.background = "";
         document.getElementById("answer_"+i).onclick = incorrect;
         // If question has already been iccorectly answered, highlight incorrect button selected
@@ -190,5 +234,6 @@ function reset_quiz(){
     }
     show_question();
     document.getElementById("debug").innerHTML = "Restarting timer "
-    setTimeout(timer,1000);
+    // clear timeout incase quiz has been reset before finishing and restart timer 
+    clearTimeout(timer);
 }

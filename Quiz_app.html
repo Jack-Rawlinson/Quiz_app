@@ -3,11 +3,29 @@
 <head>
 </head>
 
-<body>
+<body onload="get_categories()">
     <div id="file_div">
-        <label for="file_input">Upload file</label>
-        <input type="file" id="fileinput" name="file_input"><br>
-        <input type="checkbox" id="header" checked>Ignore file header?
+        <div style="float:left">
+            <label for="file_input">Upload file</label>
+            <input type="file" id="fileinput" name="file_input"><br>
+            <input type="checkbox" id="header" checked>Ignore file header?
+        </div>
+        <div style="float:right">
+            <button onclick="load_question_data()">Generate quiz</button>
+            <a href="https://opentdb.com/api.php?amount=15">Open Trivia DB?</a><br>
+            <a href="https://opentdb.com/api_category.php">categories?</a><br>
+            <input type="number" id="number_of_questions" value="10">No. questions
+            <select id="categories" name="Category">
+                <option value="all" selected>All categories</option>
+            </select>
+            <select id="difficulty" name="difficulty">
+                <option value="any" selected>Any difficulty</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+        </div>
+            
     </div>
     <p id="debug"></p>
 
