@@ -11,9 +11,9 @@
             <input type="checkbox" id="header" checked>Ignore file header?
         </div>
         <div style="float:right">
-            <button onclick="load_question_data()">Generate quiz</button>
+            <button onclick="load_question_data()">Generate quiz</button> 
             <a href="https://opentdb.com/api.php?amount=15">Open Trivia DB?</a><br>
-            <a href="https://opentdb.com/api_count.php?category=9">categories?</a><br>
+            <a href="https://opentdb.com/api.php?amount=10&type=boolean">categories?</a><br>
             No. questions <input type="number" id="number_of_questions" value="10">
             Category <select id="categories" name="Category">
                 <option value="all" selected>All categories</option>
@@ -23,6 +23,11 @@
                 <option value="easy">Easy</option>
                 <option value="medium">Medium</option>
                 <option value="hard">Hard</option>
+            </select>
+            Type <select id="type">
+                <option value="any" selected>Any</option>
+                <option value="multiple">Multiple Choice</option>
+                <option value="boolean">True/False</option>
             </select>
         </div>
             

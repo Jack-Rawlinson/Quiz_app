@@ -62,6 +62,7 @@ async function load_question_data(){
     let setup = ``;
     // Get desired setup of questions questions from HTML
     let no_questions = document.getElementById("number_of_questions").value;
+    let type = document.getElementById("type").value;
     let category = document.getElementById("categories").value;
     let difficulty = document.getElementById("difficulty").value;
     if(category != "all"){
@@ -70,11 +71,21 @@ async function load_question_data(){
     if(difficulty != "any"){
         setup = setup.concat("&difficulty=", difficulty);
     }
+    if(type != "any"){
+        setup = setup.concat("&type=", type)
+    }
     // Fetch data from opendb api, use await to avoid astnc issue with data loading 
-    alert(`setup = ${setup}, url = https://opentdb.com/api.php?amount=${no_questions}&type=multiple${setup}`);
-    let questions = await fetch_data(`https://opentdb.com/api.php?amount=${no_questions}&type=multiple${setup}`);    
+    let questions = await fetch_data(`https://opentdb.com/api.php?amount=${no_questions}${setup}`);    
     // Store questions from API in useable format 
-    questions["results"].forEach(row => quiz_data.push([row["question"], row["correct_answer"], row["incorrect_answers"][0], row["incorrect_answers"][1], row["incorrect_answers"][2], false]));
+    questions["results"].forEach(row => {
+        if(row["type"] == "multiple"){
+            quiz_data.push([row["question"], row["correct_answer"], row["incorrect_answers"][0], row["incorrect_answers"][1], row["incorrect_answers"][2], false]);
+        }
+        else{
+            quiz_data.push([row["question"], row["correct_answer"],"","","",false]);
+        }
+        }
+    );
     // Hide starting div for entering files and reveal div for anwsering questions
     document.getElementById("file_div").style.display = "none";
     document.getElementById("question_div").style.display = "";
