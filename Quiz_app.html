@@ -13,12 +13,12 @@
         <div style="float:right">
             <button onclick="load_question_data()">Generate quiz</button>
             <a href="https://opentdb.com/api.php?amount=15">Open Trivia DB?</a><br>
-            <a href="https://opentdb.com/api_category.php">categories?</a><br>
-            <input type="number" id="number_of_questions" value="10">No. questions
-            <select id="categories" name="Category">
+            <a href="https://opentdb.com/api_count.php?category=9">categories?</a><br>
+            No. questions <input type="number" id="number_of_questions" value="10">
+            Category <select id="categories" name="Category">
                 <option value="all" selected>All categories</option>
             </select>
-            <select id="difficulty" name="difficulty">
+            Difficulty <select id="difficulty" name="difficulty">
                 <option value="any" selected>Any difficulty</option>
                 <option value="easy">Easy</option>
                 <option value="medium">Medium</option>
@@ -33,10 +33,21 @@
         <h4 id="Question"></h4>
         <label id="score"></label>
         <label id="timer">00:00</label><br>
-        <button id="answer_1"></button>
-        <button id="answer_2"></button><br>
-        <button id="answer_3"></button>
-        <button id="answer_4"></button><br>
+        <div id="multiple_answers">
+            <button id="answer_1"></button>
+            <button id="answer_2"></button><br>
+            <button id="answer_3"></button>
+            <button id="answer_4"></button><br>
+        </div>
+        <div id="true_false">
+            <button id="true">True</button>
+            <button id="false">False</button><br>
+        </div>
+        <div id="text_answer">
+            <input id="text_input" type="text">
+            <label id="check_or_cross"></label>
+            <button id="check" onclick="check_answer()">Check Answer</button>
+        </div><br>
         <button onclick="previous_question()" disabled id="back_button">Back</button>
         <button onclick="next_question()" id="next_button">Next</button>
         <button onclick="reset_quiz()">Reset</button>

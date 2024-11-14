@@ -37,7 +37,9 @@ function load_event(event){
     let csv_data =[];
     rows.forEach(row => csv_data.push(row.split(",")));
     // Store questions and answers in quiz_data array, false variable tells if question has already been answered or not
-    csv_data.forEach(row => quiz_data.push([row[0], row[1], row[2], row[3], row[4], false]));
+    csv_data.forEach(row => {
+        row.push(false);
+        quiz_data.push(row);});
     // Prevent user from escaping the scope of the array
     if(quiz_data.length == 1){document.getElementById("next_button").disbaled = true;}
     // Load first question 
@@ -45,8 +47,10 @@ function load_event(event){
     setTimeout(timer,1000);
 }
 async function get_categories(){
+    // Fetch categories list from opentdb 
     let array = await fetch_data("https://opentdb.com/api_category.php");
     let categories = array["trivia_categories"];
+    // Set up select element on start page 
     categories.forEach(row => {
         let option = document.createElement("option");
         option.value = row["id"];
@@ -56,7 +60,7 @@ async function get_categories(){
 }
 async function load_question_data(){
     let setup = ``;
-    // Get number of desired questions from HTML
+    // Get desired setup of questions questions from HTML
     let no_questions = document.getElementById("number_of_questions").value;
     let category = document.getElementById("categories").value;
     let difficulty = document.getElementById("difficulty").value;
@@ -99,8 +103,104 @@ function show_question(){
         answer_order.push(answer_index);
         answer_index.push(0);
     }
+    // Show question and current score 
     document.getElementById("Question").innerHTML = quiz_data[question_no][0];
     document.getElementById("score").textContent = correct_answers+ "/" + quiz_data.length;
+    // Show appropriate answer box for the type of question
+    if(quiz_data[question_no][2] == ""){
+        if(quiz_data[question_no][1].toLowerCase() == "true" || quiz_data[question_no][1].toLowerCase() == "false"){
+            true_false();
+        }
+        else{exact_answer()}
+    }
+    else{multiple_choice()}
+    
+}
+function true_false(){
+    // Show text input for exact answer and hid display for other question types
+    document.getElementById("multiple_answers").style.display = "none";
+    document.getElementById("true_false").style.display = "";
+    document.getElementById("text_answer").style.display = "none";
+    // Set button bg's to default
+    document.getElementById("true").style.background = "";
+    document.getElementById("false").style.background = "";
+    // Check if question has been answered, show correct answer if so and if incorrect and was chosen make this clear as well
+    if(quiz_data[question_no][5] == true){
+        // Remember to use lower cases to avoid case issues 
+        switch(quiz_data[question_no][1].toLowerCase()){
+            case "true":
+                document.getElementById("true").style.background = "green";
+                if(answer_order[question_no][4] != 0){document.getElementById("false").style.background = "red"}
+                break;
+            case "false":
+                document.getElementById("false").style.background = "green";
+                if(answer_order[question_no][4] != 0){document.getElementById("true").style.background = "red"}
+                break;
+        }
+    }
+    // Link correct button to correct function
+    document.getElementById(quiz_data[question_no][1].toLowerCase()).onclick = correct;
+    // Use boolean statement to find which answer is incorrect
+    let boolean_answer = !(quiz_data[question_no][1].toLowerCase() === "true");
+    // Link incorrect answer to incorrect function
+    document.getElementById(boolean_answer.toString().toLowerCase()).onclick = incorrect;
+}
+function exact_answer(){
+    // Show text input for exact answer and hid display for other question types
+    document.getElementById("multiple_answers").style.display = "none";
+    document.getElementById("true_false").style.display = "none";
+    document.getElementById("text_answer").style.display = "";
+    // Show appropriate error/success answer box dependent on previous answer 
+    if(quiz_data[question_no][5] == true){
+        if(answer_order[question_no][4] == quiz_data[question_no][1]){
+            document.getElementById("text_input").value = quiz_data[question_no][1];
+            document.getElementById("text_input").disabled = true;
+            document.getElementById("check_or_cross").innerHTML = `\u2705`;
+        }
+        else{
+            document.getElementById("text_input").value = answer_order[question_no][4];
+            document.getElementById("text_input").disabled = true;
+            document.getElementById("check_or_cross").innerHTML = `\u274C Answer: ${quiz_data[question_no][1]}`;
+        }
+    }
+    else{
+        // If question hasn't been answered then reset display to avoid issue for quizzes with multiple exact answer questions
+        document.getElementById("text_input").value = "";
+        document.getElementById("text_input").disabled = false;
+        document.getElementById("check_or_cross").innerHTML = "";
+        document.getElementById("check").style.display = "";
+    }
+}
+function check_answer(){
+    // Exact answer questions require their own unique check function
+    let answer = document.getElementById("text_input").value;
+    // Stop user from changing answer and hide check button to stop multiple answer submissions
+    document.getAnimations("text_input").disabled = true;
+    document.getElementById("check").style.display = "none";
+    if(quiz_data[question_no][5] == false){
+        // Update array so script knows this question has already been answered
+        quiz_data[question_no][5] = true;
+        // Add a tick next to answer if correct, save answer in answer order
+        if(answer.toLowerCase() == quiz_data[question_no][1].toLowerCase()){
+            document.getElementById("check_or_cross").innerHTML = `\u2705`;
+            answer_order[question_no][4] = quiz_data[question_no][1];
+            correct_answers++;
+
+            show_question();
+            quiz_finished();
+        }
+        else{
+            // Show cross with the correct answer if quizzer is wrong, store incorrect answer in answer_order 
+            document.getElementById("check_or_cross").innerHTML = `\u274C Answer: ${quiz_data[question_no][1]}`;
+            answer_order[question_no][4] = answer;
+        }
+    }
+}
+function multiple_choice(){
+    // Show multiple options and hid display for other question types
+    document.getElementById("multiple_answers").style.display = "";
+    document.getElementById("true_false").style.display = "none";
+    document.getElementById("text_answer").style.display = "none";
     // Update elements in question_div to show the current question
     for(let i=0; i<(answer_order[question_no].length - 1); i++){
         // variable to store index of answer (eaier to read this way)
@@ -157,11 +257,11 @@ function quiz_finished(){
 }
 function correct(){
     // Change bg of correct button green
-    let correct_index = parseInt(this.id.slice(-1));
+    let id_text = this.id;
     if(quiz_data[question_no][5] == false){
-        document.getElementById("answer_"+correct_index).style.background = "green";
+        document.getElementById(id_text).style.background = "green";
         correct_answers++;
-        // update array so script knows this question has already been answered
+        // Update array so script knows this question has already been answered
         quiz_data[question_no][5] = true;
         show_question();
         quiz_finished();
@@ -171,7 +271,7 @@ function incorrect(){
     // Change bg of incorrect button red
     let incorrect_index = parseInt(this.id.slice(-1));
     if(quiz_data[question_no][5] == false){
-        document.getElementById("answer_"+incorrect_index).style.background = "red";
+        document.getElementById(this.id).style.background = "red";
         // Store index of incorrect button
         answer_order[question_no][4] = incorrect_index;
         // update array so script knows this question has already been answered
