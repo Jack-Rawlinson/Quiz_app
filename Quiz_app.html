@@ -1,19 +1,223 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <style>
+        /* General body styles */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        background-color: #f4f4f4;
+    }
+
+    /* Container for the whole layout */
+    #file_div {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+        background-color: #fff;
+        margin: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Left side of the layout */
+    .left_div {
+        flex: 1;
+        padding: 20px;
+    }
+
+    .left_div label {
+        font-weight: bold;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .left_div input[type="file"] {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .left_div input[type="checkbox"] {
+        margin-top: 10px;
+    }
+
+    /* Right side of the layout */
+    .right_div {
+        flex: 1;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-left: 2px solid #ddd;
+    }
+
+    .right_div select,
+    .right_div input[type="number"] {
+        margin-bottom: 10px;
+        padding: 8px;
+        width: 100%;
+        font-size: 16px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .right_div button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .right_div button:hover {
+        background-color: #0056b3;
+    }
+
+    /* Question and answers section */
+    #question_div {
+        display: none;
+        padding: 20px;
+        background-color: #fff;
+        margin: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #question_div h4 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    #question_div label {
+        font-size: 18px;
+        margin-right: 10px;
+    }
+
+    #question_div button {
+        margin-top: 10px;
+        padding: 12px 20px;
+        font-size: 16px;
+        background-color: #07e3eb;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    #question_div button:hover {
+        background-color: #218838;
+    }
+
+    #question_div #multiple_answers button,
+    #question_div #true_false button {
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    #question_div #text_answer input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    #question_div #text_answer button {
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: #ffc107;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    #question_div #text_answer button:hover {
+        background-color: #e0a800;
+    }
+
+    /* Control buttons (next, back, reset) */
+    #question_div button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+    #question_div #back_button,
+    #question_div #next_button,
+    #question_div #reset_button {
+        margin-top: 20px;
+        padding: 12px 20px;
+        font-size: 16px;
+    }
+
+    #question_div #back_button {
+        background-color: #6c757d;
+    }
+
+    #question_div #next_button {
+        background-color: #007bff;
+    }
+
+    #question_div #reset_button {
+        background-color: #dc3545;
+    }
+
+    #question_div #back_button:hover {
+        background-color: #5a6268;
+    }
+
+    #question_div #next_button:hover {
+        background-color: #0056b3;
+    }
+
+    #question_div #reset_button:hover {
+        background-color: #c82333;
+    }
+
+    /* Small screen (mobile) styling */
+    @media screen and (max-width: 768px) {
+        #file_div {
+            flex-direction: column;
+        }
+
+        .left_div, .right_div {
+            flex: none;
+            width: 100%;
+            padding: 10px;
+        }
+
+        .right_div select,
+        .right_div input[type="number"] {
+            width: 100%;
+        }
+
+        #question_div button {
+            width: 100%;
+        }
+
+        #question_div #multiple_answers button {
+            width: 100%;
+        }
+
+        #question_div #true_false button {
+            width: 100%;
+        }
+    }
+
+    </style>
 </head>
 
 <body onload="get_categories()">
     <div id="file_div">
-        <div style="float:left">
+        <div>
             <label for="file_input">Upload file</label>
             <input type="file" id="fileinput" name="file_input"><br>
             <input type="checkbox" id="header" checked>Ignore file header?
         </div>
-        <div style="float:right">
-            <button onclick="load_question_data()">Generate quiz</button> 
-            <a href="https://opentdb.com/api.php?amount=15">Open Trivia DB?</a><br>
-            <a href="https://opentdb.com/api.php?amount=10&type=boolean">categories?</a><br>
+        <div>
             No. questions <input type="number" id="number_of_questions" value="10">
             Category <select id="categories" name="Category">
                 <option value="all" selected>All categories</option>
@@ -28,7 +232,8 @@
                 <option value="any" selected>Any</option>
                 <option value="multiple">Multiple Choice</option>
                 <option value="boolean">True/False</option>
-            </select>
+            </select><br>
+            <button onclick="load_question_data()">Generate quiz</button> 
         </div>
             
     </div>

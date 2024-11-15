@@ -25,7 +25,7 @@ function loadfile(event){
     reader.readAsText(event.target.files[0]);
     // Hide div for entering files and reveal div for anwsering questions
     document.getElementById("file_div").style.display = "none";
-    document.getElementById("question_div").style.display = "";
+    document.getElementById("question_div").style.display = "block";
 }
 function load_event(event){
     // Split data by rows
@@ -88,7 +88,7 @@ async function load_question_data(){
     );
     // Hide starting div for entering files and reveal div for anwsering questions
     document.getElementById("file_div").style.display = "none";
-    document.getElementById("question_div").style.display = "";
+    document.getElementById("question_div").style.display = "block";
     show_question();
     setTimeout(timer,1000);
 }
